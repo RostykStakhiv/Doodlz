@@ -9,6 +9,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Point;
+import android.graphics.PorterDuffXfermode;
 import android.provider.MediaStore;
 import android.support.v4.print.PrintHelper;
 import android.util.AttributeSet;
@@ -16,6 +17,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
+import android.graphics.PorterDuff;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +30,10 @@ public class DoodleView extends View {
    private Bitmap bitmap; // drawing area for displaying or saving
    private Canvas bitmapCanvas; // used to to draw on the bitmap
    private final Paint paintScreen; // used to draw bitmap onto screen
-   private final Paint paintLine; // used to draw lines onto bitmap
+   private Paint paintLine; // used to draw lines onto bitmap
+   private Boolean isEraserMode = false;
+   private int drawingColor;
+   private int strokeWidth = 5;
 
    // Maps of current Paths being drawn and Points in those Paths
    private final Map<Integer, Path> pathMap = new HashMap<>();
@@ -39,13 +44,8 @@ public class DoodleView extends View {
       super(context, attrs); // pass context to View's constructor
       paintScreen = new Paint(); // used to display bitmap onto screen
 
-      // set the initial display settings for the painted line
-      paintLine = new Paint();
-      paintLine.setAntiAlias(true); // smooth edges of drawn line
-      paintLine.setColor(Color.BLACK); // default color is black
-      paintLine.setStyle(Paint.Style.STROKE); // solid line
-      paintLine.setStrokeWidth(5); // set the default line width
-      paintLine.setStrokeCap(Paint.Cap.ROUND); // rounded line ends
+       drawingColor = Color.BLACK;
+      paintLine = createPaintWithColor(drawingColor);
    }
 
    // creates Bitmap and Canvas based on View's size
@@ -67,22 +67,24 @@ public class DoodleView extends View {
 
    // set the painted line's color
    public void setDrawingColor(int color) {
+      drawingColor = color;
       paintLine.setColor(color);
    }
 
    // return the painted line's color
    public int getDrawingColor() {
-      return paintLine.getColor();
+      return drawingColor;
    }
 
    // set the painted line's width
    public void setLineWidth(int width) {
+       strokeWidth = width;
       paintLine.setStrokeWidth(width);
    }
 
    // return the painted line's width
    public int getLineWidth() {
-      return (int) paintLine.getStrokeWidth();
+      return strokeWidth;
    }
 
    // perform custom drawing when the DoodleView is refreshed on screen
@@ -186,6 +188,33 @@ public class DoodleView extends View {
       Path path = pathMap.get(lineID); // get the corresponding Path
       bitmapCanvas.drawPath(path, paintLine); // draw to bitmapCanvas
       path.reset(); // reset the Path
+   }
+
+   private Paint createPaintWithColor(int color) {
+
+       // set the initial display settings for the painted line
+       Paint paint = new Paint();
+       paint.setAntiAlias(true); // smooth edges of drawn line
+       paint.setColor(color);
+       paint.setStyle(Paint.Style.STROKE); // solid line
+       paint.setStrokeWidth(strokeWidth); // set the default line width
+       paint.setStrokeCap(Paint.Cap.ROUND); // rounded line ends
+       return paint;
+   }
+
+   private void updateDrawingMode() {
+      if(isEraserMode) {
+          paintLine.setColor(Color.WHITE);
+          paintLine.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+      } else {
+          paintLine = createPaintWithColor(drawingColor);
+         paintLine.setColor(drawingColor);
+      }
+   }
+
+   public void setIsEraserMode(boolean isEraser) {
+      this.isEraserMode = isEraser;
+      updateDrawingMode();
    }
 
    // save the current image to the Gallery

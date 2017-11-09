@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
+
    <item
       android:id="@+id/color"
       android:title="@string/menuitem_color"
@@ -34,5 +35,19 @@
       android:title="@string/menuitem_print"
       android:icon="@drawable/ic_print_24dp"
       app:showAsAction="ifRoom">
+   </item>
+
+   <item
+       android:id="@+id/eraser"
+       android:title="@string/eraser_mode"
+       android:icon="@drawable/ic_delete_24dp"
+       app:showAsAction="ifRoom">
+   </item>
+
+   <item
+       android:id="@+id/drawer"
+       android:title="@string/drawing_mode"
+       android:icon="@drawable/ic_brush_24dp"
+       app:showAsAction="ifRoom">
    </item>
 </menu>

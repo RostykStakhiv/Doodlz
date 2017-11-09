@@ -163,6 +163,12 @@ public class MainActivityFragment extends Fragment {
          case R.id.print:
             doodleView.printImage(); // print the current images
             return true; // consume the menu event
+         case R.id.eraser:
+            doodleView.setIsEraserMode(true);
+            return true;
+          case R.id.drawer:
+              doodleView.setIsEraserMode(false);
+              return true;
       }
 
       return super.onOptionsItemSelected(item);
